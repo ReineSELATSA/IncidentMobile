@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'ListeIncidents.dart';
-import 'addForm.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'accueil.dart';
 
 void main() {
   runApp(new MyApp());
@@ -28,150 +30,152 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool oui = false;
+  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 12.0);
 
-  GoogleMapController _controller;
-  final CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(24.903623, 67.198367));
+  TextEditingController _passwordController = new TextEditingController();
+  TextEditingController _emailController = new TextEditingController();
+
+  final _formKey = new GlobalKey<FormState>();
+
+  String _email;
+  String _password;
+
+  bool _autoValidate = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(
-              child: Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage('df'),
+      backgroundColor: Colors.blue[400],
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              color: Color(0xffF3F3F3),
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Form(
+                  key: _formKey,
+                  autovalidate: _autoValidate,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                        child: Image.asset(
+                          "images/add.png",
+                          height: 100,
+                          width: 100,
+                        ),
+                      ),
+                      SizedBox(height: 25.0),
+
+                      // TextFormField for email address
+
+                      TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        autofocus: false,
+                        controller: _emailController,
+                        validator: validateEmail,
+                        onSaved: (value) => _email = value,
+                        style: style,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            hintText: "Email",
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0))),
+                      ),
+
+                      SizedBox(height: 25.0),
+
+                      // TextFormField for email address
+
+                      TextFormField(
+                        autofocus: false,
+                        controller: _passwordController,
+                        validator: validatePassword,
+                        onSaved: (value) => _password = value,
+                        style: style,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            hintText: "Password",
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0))),
+                      ),
+
+                      SizedBox(height: 25.0),
+
+                      Divider(color: Colors.black), // divider
+
+                      SizedBox(height: 20.0),
+
+                      Material(
+                        // login button
+                        elevation: 5.0,
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.blue,
+                        child: MaterialButton(
+                          minWidth: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return Accueil();
+                              }));
+                            } else {
+                              setState(() {
+                                // validation error
+                                _autoValidate = true;
+                              });
+                            }
+                          },
+                          child: Text("Login",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16)),
+                        ),
+                      ),
+                      SizedBox(height: 10.0),
+                    ],
+                  ),
                 ),
               ),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.red, Colors.white])),
             ),
-            ListTile(
-                title: Text(
-                  'Profile',
-                  style: TextStyle(fontSize: 18),
-                ),
-                trailing: Icon(Icons.person),
-                onTap: () {
-                  /* 
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => quiz())); */
-                }),
-            Divider(
-              color: Colors.redAccent,
-            ),
-            ListTile(
-                title: Text(
-                  'Paramètres',
-                  style: TextStyle(fontSize: 18),
-                ),
-                trailing: Icon(Icons.settings),
-                onTap: () {
-                  /* 
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => quiz())); */
-                }),
-            Divider(
-              color: Colors.redAccent,
-            ),
-            ListTile(
-                title: Text(
-                  'A propos de Incidenz',
-                  style: TextStyle(fontSize: 18),
-                ),
-                trailing: Icon(Icons.account_box),
-                onTap: () {
-                  /* 
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => quiz())); */
-                }),
-            Divider(
-              color: Colors.redAccent,
-            ),
-          ],
-        ),
-      ),
-      appBar: new AppBar(
-        title: new Text('Incidenz'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            color: Colors.white,
-            onPressed: () {},
-            padding: const EdgeInsets.only(right: 20.0),
-          )
-        ],
-        elevation: 10.0,
-        centerTitle: true,
-      ),
-      body: GoogleMap(
-        initialCameraPosition: _initialPosition,
-        mapType: MapType.normal,
-        onMapCreated: (controller) {
-          setState(() {
-            _controller = controller;
-          });
-        },
-        onTap: (cordinate) {
-          _controller.animateCamera(CameraUpdate.newLatLng(cordinate));
-        },
-      ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddForm()));
-        },
-        elevation: 10.0,
-        tooltip: 'Changer oui',
-        child: new Icon(Icons.add),
-      ),
-      /*   persistentFooterButtons: [
-        IconButton(
-          icon: Icon(Icons.add),
-          onPressed: null,
-          color: Colors.red,
-          iconSize: 28,
-          focusColor: Colors.red,
-          padding: const EdgeInsets.only(right: 12),
-        ),
-        IconButton(icon: Icon(Icons.remove), onPressed: null)
-      ], */
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: new BottomNavigationBar(
-        onTap: (int i) {
-          if (i == 0) {
-            print("Recherche");
-          } else if (i == 1) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ListeIncidents()));
-          }
-        },
-        items: [
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.search),
-            title: new Text("Right"),
           ),
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.navigation_sharp),
-            title: new Text("43"),
-          ),
-        ],
+        ),
       ),
     );
   }
-
-  void boutonDelete() {
-    setState(() {
-      oui = !oui;
-    });
-  }
 }
 
-void quiz() {}
+String validatePassword(String value) {
+  Pattern pattern = r'^(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+  RegExp regex = new RegExp(pattern);
+  if (value.length == 0) {
+    return "Password is Required";
+  } else if (!regex.hasMatch(value))
+    return 'Password required: Alphabet, Number & 8 chars';
+  else
+    return null;
+}
+
+String validateEmail(String value) {
+  Pattern pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regex = new RegExp(pattern);
+  if (value.length == 0) {
+    return "Email is Required";
+  } else if (!regex.hasMatch(value))
+    return 'Enter Valid Email';
+  else
+    return null;
+}

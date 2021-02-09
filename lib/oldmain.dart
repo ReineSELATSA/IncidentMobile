@@ -1,48 +1,106 @@
-/* import 'package:flutter/material.dart';
-import 'package:flutter_app/body.dart';
-import 'package:flutter_app/question.dart';
+import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: MyApp(),
+    home: StarWarsData(),
   ));
 }
 
-class MyApp extends StatelessWidget {
+class StarWarsData extends StatefulWidget {
+  @override
+  StarWarsState createState() => StarWarsState();
+}
+
+class StarWarsState extends State<StarWarsData> {
+  final String url = "https://jsonplaceholder.typicode.com/comments";
+  List data;
+
+  Future<String> getSWData() async {
+    var res = await http.get(Uri.parse(url), headers: {
+      "Content-Type": "application/json",
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+    });
+
+    setState(() {
+      var resBody = json.decode(res.body);
+      data = resBody;
+    });
+
+    return "Success!";
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(   
-        appBar: new AppBar(
-          title: Text("Incidenz"),
-        ),
-        body: Column(
-          children: [
-            Center(
-              child: Image.asset(
-                'images/cover.jpg',
-                height: 400,
-                width: 600,
-                scale: 2,
-              ),
-              heightFactor: 1.2,
-            ),
-            MaterialButton(
-              child: Text(
-                "Commencer le quiz",
-                style: TextStyle(color: Colors.white),
-                textScaleFactor: 2.0,
-                textAlign: TextAlign.center,
-              ),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Question()));
-              },
-              color: Colors.blue,
-            )
-          ],
-        ));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Star Wars Starships"),
+        backgroundColor: Colors.deepPurpleAccent,
+      ),
+      body: Column(
+        children: [
+          Text(data[2]["name"]),
+          ListView.builder(
+            itemCount: data == null ? 0 : data.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Card(
+                        child: Container(
+                            padding: EdgeInsets.all(15.0),
+                            child: Row(
+                              children: <Widget>[
+                                Text("Name: "),
+                                Text(data[index]["name"],
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.black87)),
+                              ],
+                            )),
+                      ),
+                      Card(
+                        child: Container(
+                            padding: EdgeInsets.all(15.0),
+                            child: Row(
+                              children: <Widget>[
+                                Text("Model: "),
+                                Text(data[index]["body"],
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.red)),
+                              ],
+                            )),
+                      ),
+                      Card(
+                        child: Container(
+                            padding: EdgeInsets.all(15.0),
+                            child: Row(
+                              children: <Widget>[
+                                Text("Cargo Capacity: "),
+                                Text(data[index]["email"],
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.black87)),
+                              ],
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.getSWData();
   }
 }
- */

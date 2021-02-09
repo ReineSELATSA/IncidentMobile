@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:select_form_field/select_form_field.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class AddForm extends StatefulWidget {
@@ -53,12 +57,57 @@ final List<Map<String, dynamic>> _items = [
   },
 ];
 
+Future registerEmployees(
+    String name, String email, String body, BuildContext context) async {
+  var Url = "https://jsonplaceholder.typicode.com/posts";
+  var response = await http.post(Url,
+      headers: <String, String>{"Content-Type": "application/json"},
+      body: jsonEncode(<String, String>{
+        "name": name,
+        "email": email,
+        "body": body,
+      }));
+
+  String responseString = response.body;
+  if (response.statusCode == 200) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return MyAlertDialog(title: 'Backend Response', content: response.body);
+      },
+    );
+  } else {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return MyAlertDialog(title: 'Backend Response', content: response.body);
+      },
+    );
+  }
+}
+
 class MyCustomFormState extends State<MyCustomForm> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController titre = new TextEditingController();
   TextEditingController description = new TextEditingController();
   TextEditingController emplacement = new TextEditingController();
   TextEditingController categorie = new TextEditingController();
+  File _file;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _file = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +131,26 @@ class MyCustomFormState extends State<MyCustomForm> {
                             color: Colors.blue,
                           ),
                         )),
-                    Image.asset(
-                      'images/add.png',
-                      height: 100,
-                      width: 100,
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: getImage,
+                          child: Image.asset(
+                            'images/add.png',
+                            height: 100,
+                            width: 100,
+                          ),
+                        ),
+                        Center(
+                          child: _file == null
+                              ? Text('')
+                              : Image.file(
+                                  _file,
+                                  width: 100,
+                                  height: 100,
+                                ),
+                        ),
+                      ],
                     ),
                     Padding(
                         padding: EdgeInsets.only(top: 15),
@@ -181,12 +246,45 @@ class MyCustomFormState extends State<MyCustomForm> {
                               // It returns true if the form is valid, otherwise returns false
                               if (_formKey.currentState.validate()) {
                                 // If the form is valid, display a Snackbar.
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text('Data is in processing.')));
+
+                                String titr = titre.text;
+                                String cat = emplacement.text;
+                                String des = description.text;
+                                registerEmployees(titr, cat, des, context);
+                                titre.text = '';
+                                emplacement.text = '';
+                                description.text = '';
                               }
                             })),
                   ],
                 ),
                 padding: EdgeInsets.all(12))));
+  }
+}
+
+class MyAlertDialog extends StatelessWidget {
+  final String title;
+  final String content;
+  final List<Widget> actions;
+
+  MyAlertDialog({
+    this.title,
+    this.content,
+    this.actions = const [],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        this.title,
+        style: Theme.of(context).textTheme.title,
+      ),
+      actions: this.actions,
+      content: Text(
+        this.content,
+        style: Theme.of(context).textTheme.body1,
+      ),
+    );
   }
 }

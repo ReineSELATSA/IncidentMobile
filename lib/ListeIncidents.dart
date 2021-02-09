@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 
 // ignore: must_be_immutable
 class ListeIncidents extends StatefulWidget {
-  Size screenSize;
   @override
   _IncidentState createState() => _IncidentState();
 }
@@ -10,7 +12,7 @@ class ListeIncidents extends StatefulWidget {
 class _IncidentState extends State<ListeIncidents> {
   @override
   Widget build(BuildContext context) {
-    final appTitle = "Formulaire de déclaration d'incident";
+    final appTitle = "Liste des incidents";
     return new Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
@@ -68,45 +70,68 @@ class MylistState extends State<Mylist> {
       "date": "2019"
     },
   ];
+
+  List data = [];
+
+  Future<String> getSWData() async {
+    var res = await http.get('https://jsonplaceholder.typicode.com/comments');
+
+    setState(() {
+      var resBody = json.decode(res.body);
+      data = resBody;
+    });
+
+    return "Success!";
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.getSWData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      child: ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: quiz.length,
-          itemBuilder: (BuildContext listcontext, int index) {
-            return Card(
-                child: InkWell(
-              onTap: () {
-                _information(context, quiz, index);
-              },
-              child: Row(
-                children: [
-                  Image.asset(
-                    quiz[index]['image'],
-                    height: 100,
-                    width: 100,
-                    fit: BoxFit.fill,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 130.0,
-                    child: Column(
-                      children: [
-                        Text(quiz[index]['titre']),
-                        Text(quiz[index]['date']),
-                        Text(quiz[index]['statut'])
-                      ],
+    if (data.length != 0) {
+      return new Container(
+        child: ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: data.length,
+            itemBuilder: (BuildContext listcontext, int index) {
+              return Card(
+                  child: InkWell(
+                onTap: () {
+                  _information(context, data, index);
+                },
+                child: Row(
+                  children: [
+                    Image.asset(
+                      quiz[2]['image'],
+                      height: 100,
+                      width: 100,
+                      fit: BoxFit.fill,
                     ),
-                  ),
-                ],
-              ),
-            ));
-          }),
-    );
+                    Container(
+                      width: MediaQuery.of(context).size.width - 130.0,
+                      child: Column(
+                        children: [
+                          Text(data[index]['name']),
+                          Text(data[index]['email'])
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+            }),
+      );
+    } else {
+      return Text("pas d'incidents enregistrés");
+    }
   }
 }
 
-_information(context, quiz, index) {
+_information(context, data, index) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -118,16 +143,16 @@ _information(context, quiz, index) {
             child: Column(
               children: [
                 Text(
-                  quiz[index]['titre'],
+                  data[index]['name'],
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  quiz[index]['date'],
+                  data[index]['email'],
                   style: TextStyle(fontSize: 12),
                 ),
                 Container(
-                  child: _result(quiz[index]['statut']),
+                  child: _result(data[index]['name']),
                 ),
                 Container(
                   height: 20,
@@ -139,7 +164,7 @@ _information(context, quiz, index) {
                       fontWeight: FontWeight.bold,
                       fontSize: 15),
                 ),
-                Text(quiz[index]['description']),
+                Text(data[index]['body']),
                 Container(
                   height: 20,
                 ),
@@ -151,7 +176,7 @@ _information(context, quiz, index) {
                       fontSize: 15),
                 ),
                 Text(
-                  quiz[index]['emplacement'],
+                  data[index]['email'],
                 ),
                 Container(
                   height: 20,
@@ -164,7 +189,7 @@ _information(context, quiz, index) {
                       fontSize: 15),
                 ),
                 Text(
-                  quiz[index]['categorie'],
+                  data[index]['name'],
                 ),
                 Text(
                   'Medias',
@@ -173,7 +198,6 @@ _information(context, quiz, index) {
                       fontWeight: FontWeight.bold,
                       fontSize: 15),
                 ),
-                Image.asset(quiz[index]['image'])
               ],
             ),
           ),
