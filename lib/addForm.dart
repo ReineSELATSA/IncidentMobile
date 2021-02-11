@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+
+import 'accueil.dart' as file;
 
 class AddForm extends StatefulWidget {
   @override
@@ -57,15 +60,16 @@ final List<Map<String, dynamic>> _items = [
   },
 ];
 
-Future registerEmployees(
-    String name, String email, String body, BuildContext context) async {
-  var Url = "https://jsonplaceholder.typicode.com/posts";
+Future registerEmployees(String titre, String categorie, String description,
+    double latitude, double longitude, BuildContext context) async {
+  var Url =
+      "http://192.168.43.1:3000/GestionIncident/createIncident/USERKAKO2749/$titre/$categorie/$description";
   var response = await http.post(Url,
       headers: <String, String>{"Content-Type": "application/json"},
       body: jsonEncode(<String, String>{
-        "name": name,
-        "email": email,
-        "body": body,
+        "titre": titre,
+        "categorie": categorie,
+        "description": description,
       }));
 
   String responseString = response.body;
@@ -74,7 +78,9 @@ Future registerEmployees(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext dialogContext) {
-        return MyAlertDialog(title: 'Backend Response', content: response.body);
+        return MyAlertDialog(
+            title: 'Backend Response',
+            content: "L'incident a été enregistré avec succès");
       },
     );
   } else {
@@ -82,18 +88,32 @@ Future registerEmployees(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext dialogContext) {
-        return MyAlertDialog(title: 'Backend Response', content: response.body);
+        return MyAlertDialog(title: 'gff', content: "Vérifiez vos champs");
       },
     );
   }
 }
 
 class MyCustomFormState extends State<MyCustomForm> {
+  static double longitude;
+  static double latitude;
+  void _getUserLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      latitude = position.latitude;
+      longitude = position.longitude;
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
   TextEditingController titre = new TextEditingController();
   TextEditingController description = new TextEditingController();
   TextEditingController emplacement = new TextEditingController();
   TextEditingController categorie = new TextEditingController();
+  String _valueChanged = '';
+  String _valueToValidate = '';
+  String _valueSaved = '';
   File _file;
   final picker = ImagePicker();
 
@@ -110,10 +130,32 @@ class MyCustomFormState extends State<MyCustomForm> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    //_initialValue = 'starValue';
+    categorie = TextEditingController(text: 'starValue');
+    _getUserLocation();
+    _getValue();
+  }
+
+  /// This implementation is just to simulate a load data behavior
+  /// from a data base sqlite or from a API
+  Future<void> _getValue() async {
+    await Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        //_initialValue = 'circleValue';
+        categorie.text = 'circleValue';
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     titre.text = '';
     description.text = '';
     emplacement.text = '';
+    categorie.text = '';
     // Build a Form widget using the _formKey created above.
     return SingleChildScrollView(
         child: Form(
@@ -164,8 +206,12 @@ class MyCustomFormState extends State<MyCustomForm> {
                     SelectFormField(
                       initialValue: 'value',
                       items: _items,
-                      onChanged: (value) => print(value),
-                      onSaved: (value) => print(value),
+                      onChanged: (val) => setState(() => _valueChanged = val),
+                      validator: (val) {
+                        setState(() => _valueToValidate = val);
+                        return null;
+                      },
+                      onSaved: (val) => setState(() => _valueSaved = val),
                     ),
                     Padding(
                         padding: EdgeInsets.only(top: 15),
@@ -185,7 +231,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                               TextStyle(color: Colors.blue, fontSize: 25)),
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Please enter valid phone number';
+                          return 'Requis';
                         }
                         return null;
                       },
@@ -248,11 +294,12 @@ class MyCustomFormState extends State<MyCustomForm> {
                                 // If the form is valid, display a Snackbar.
 
                                 String titr = titre.text;
-                                String cat = emplacement.text;
+                                String cat = categorie.text;
                                 String des = description.text;
-                                registerEmployees(titr, cat, des, context);
+                                registerEmployees(titr, cat, des, latitude,
+                                    longitude, context);
                                 titre.text = '';
-                                emplacement.text = '';
+                                categorie.text = '';
                                 description.text = '';
                               }
                             })),

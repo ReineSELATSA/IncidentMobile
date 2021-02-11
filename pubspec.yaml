@@ -32,6 +32,7 @@ dependencies:
   path_provider: ^1.5.1
   provider: ^4.0.1
   http: ^0.12.0+1
+  geolocator: ^6.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,6 +70,10 @@ flutter:
      - images/tintin.jpg
      - images/vrai.jpg
      - images/add.png
+     - images/location.png
+     - images/good.png
+     - images/bad.png
+     - images/middle.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

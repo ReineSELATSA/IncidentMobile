@@ -74,11 +74,12 @@ class MylistState extends State<Mylist> {
   List data = [];
 
   Future<String> getSWData() async {
-    var res = await http.get('https://jsonplaceholder.typicode.com/comments');
+    var res =
+        await http.get('http://192.168.43.1:3000/GestionIncident/listIncident');
 
     setState(() {
       var resBody = json.decode(res.body);
-      data = resBody;
+      data = resBody['returnValue'];
     });
 
     return "Success!";
@@ -115,8 +116,8 @@ class MylistState extends State<Mylist> {
                       width: MediaQuery.of(context).size.width - 130.0,
                       child: Column(
                         children: [
-                          Text(data[index]['name']),
-                          Text(data[index]['email'])
+                          Text(data[index]['titre']),
+                          Text(data[index]['dateIncident'])
                         ],
                       ),
                     ),
@@ -143,16 +144,16 @@ _information(context, data, index) {
             child: Column(
               children: [
                 Text(
-                  data[index]['name'],
+                  data[index]['titre'],
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  data[index]['email'],
+                  data[index]['dateIncident'],
                   style: TextStyle(fontSize: 12),
                 ),
                 Container(
-                  child: _result(data[index]['name']),
+                  child: _result(data[index]['status']),
                 ),
                 Container(
                   height: 20,
@@ -164,7 +165,7 @@ _information(context, data, index) {
                       fontWeight: FontWeight.bold,
                       fontSize: 15),
                 ),
-                Text(data[index]['body']),
+                Text(data[index]['description']),
                 Container(
                   height: 20,
                 ),
@@ -176,7 +177,7 @@ _information(context, data, index) {
                       fontSize: 15),
                 ),
                 Text(
-                  data[index]['email'],
+                  data[index]['titre'],
                 ),
                 Container(
                   height: 20,
@@ -189,7 +190,7 @@ _information(context, data, index) {
                       fontSize: 15),
                 ),
                 Text(
-                  data[index]['name'],
+                  data[index]['categorie'],
                 ),
                 Text(
                   'Medias',

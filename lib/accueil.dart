@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'ListeIncidents.dart';
 import 'addForm.dart';
 
@@ -23,11 +24,101 @@ class MyAccueil extends StatefulWidget {
 }
 
 class MyAccueilState extends State<MyAccueil> {
-  bool oui = false;
+  final Set<Marker> _markers = {};
+  BitmapDescriptor mapMarker;
+  BitmapDescriptor good;
+  BitmapDescriptor bad;
+  BitmapDescriptor middle;
 
-  GoogleMapController _controller;
-  final CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(24.903623, 67.198367));
+  void setCustomMarker() async {
+    good = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'images/good.png');
+    bad = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'images/bad.png');
+
+    middle = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'images/middle.png');
+  }
+
+  final List data = [
+    {
+      "titre": "fsd",
+      "description": "lksdfjsd",
+      "latitude": "3.8261317",
+      "longitude": "11.4937302",
+    },
+    {
+      "titre": "DF",
+      "description": "lSFkjsd",
+      "latitude": "3.8261317",
+      "longitude": "11.4857302",
+    },
+    {
+      "titre": "llssdl",
+      "description": "lkjsfdsd",
+      "latitude": "3.8261317",
+      "longitude": "11.4737302",
+    },
+    {
+      "titre": "bonjour",
+      "description": "lkjsd",
+      "latitude": "3.8261317",
+      "longitude": "11.4840302",
+    },
+    {
+      "titre": "oui",
+      "description": "lkjsd",
+      "latitude": "3.8261317",
+      "longitude": "11.4887302",
+    },
+  ];
+
+  static LatLng _initialPosition;
+  static double a;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserLocation();
+    setCustomMarker();
+  }
+
+  void _getUserLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _initialPosition = LatLng(position.latitude, position.longitude);
+      a = position.longitude;
+    });
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() {
+      data.forEach((element) {
+        if (element['titre'].toString() == "bonjour") {
+          mapMarker = good;
+        } else if (element['titre'].toString() == 'oui') {
+          mapMarker = bad;
+        } else {
+          mapMarker = middle;
+        }
+        _markers.add(
+          Marker(
+            markerId: MarkerId(element['titre']),
+            position: LatLng(double.parse(element['latitude']),
+                double.parse(element['longitude'])),
+            icon : mapMarker,
+            infoWindow: InfoWindow(
+                title: element['titre'],
+                snippet:
+                    "$element['description']" + "\n" + "$element['latitude']"),
+          ),
+        );
+      });
+    });
+  }
+
+  bool oui = false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +139,7 @@ class MyAccueilState extends State<MyAccueil> {
             ListTile(
                 title: Text(
                   'Profile',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 15),
                 ),
                 trailing: Icon(Icons.person),
                 onTap: () {
@@ -63,7 +154,7 @@ class MyAccueilState extends State<MyAccueil> {
             ListTile(
                 title: Text(
                   'Paramètres',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 15),
                 ),
                 trailing: Icon(Icons.settings),
                 onTap: () {
@@ -78,7 +169,7 @@ class MyAccueilState extends State<MyAccueil> {
             ListTile(
                 title: Text(
                   'A propos de Incidenz',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 15),
                 ),
                 trailing: Icon(Icons.account_box),
                 onTap: () {
@@ -103,20 +194,16 @@ class MyAccueilState extends State<MyAccueil> {
             padding: const EdgeInsets.only(right: 20.0),
           )
         ],
-        elevation: 10.0,
         centerTitle: true,
       ),
       body: GoogleMap(
-        initialCameraPosition: _initialPosition,
+        initialCameraPosition: CameraPosition(
+          target: _initialPosition,
+          zoom: 14.4746,
+        ),
+        markers: _markers,
+        onMapCreated: _onMapCreated,
         mapType: MapType.normal,
-        onMapCreated: (controller) {
-          setState(() {
-            _controller = controller;
-          });
-        },
-        onTap: (cordinate) {
-          _controller.animateCamera(CameraUpdate.newLatLng(cordinate));
-        },
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: () {
@@ -151,7 +238,7 @@ class MyAccueilState extends State<MyAccueil> {
         items: [
           new BottomNavigationBarItem(
             icon: new Icon(Icons.search),
-            title: new Text("Right"),
+            title: new Text(a.toString()),
           ),
           new BottomNavigationBarItem(
             icon: new Icon(Icons.navigation_sharp),
