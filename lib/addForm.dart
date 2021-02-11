@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_app/main.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:select_form_field/select_form_field.dart';
@@ -33,41 +34,19 @@ class MyCustomForm extends StatefulWidget {
   }
 }
 
-final List<Map<String, dynamic>> _items = [
-  {
-    'value': 'Dégradation',
-    'label': 'Dégradation',
-  },
-  {
-    'value': 'Signalisation',
-    'label': 'Signalisation',
-  },
-  {
-    'value': 'Incendie',
-    'label': 'Incendie',
-  },
-  {
-    'value': 'Accident',
-    'label': 'Accident',
-  },
-  {
-    'value': 'Panne électrique',
-    'label': 'Panne électrique',
-  },
-  {
-    'value': 'Accidnet grave',
-    'label': 'Accidnet grave',
-  },
-  {
-    'value': 'Urgence Médicale',
-    'label': 'Urgence Médicale',
-  },
+var list = [
+  'Accident',
+  'Dégradation',
+  'Signalisation',
+  'Panne électrique',
+  'Accidnet grave',
+  'Urgence Médicale'
 ];
 
 Future registerEmployees(String titre, String categorie, String description,
     double latitude, double longitude, BuildContext context) async {
   var Url =
-      "http://192.168.43.74:8080/GestionIncident/createIncident/USERKAKO2749/$titre/$categorie/$description/$latitude/$longitude";
+      "http://192.168.43.74:8080/GestionIncident/createIncident/USERSERE0151/$titre/$categorie/$description/$latitude/$longitude";
   var response = await http.post(Url,
       headers: <String, String>{"Content-Type": "application/json"},
       body: jsonEncode(<String, String>{
@@ -83,8 +62,9 @@ Future registerEmployees(String titre, String categorie, String description,
       barrierDismissible: true,
       builder: (BuildContext dialogContext) {
         return MyAlertDialog(
-            title: 'Backend Response',
-            content: "L'incident a été enregistré avec succès");
+            title: 'Incident créé',
+            content:
+                'Nous avons signalé votre incident. Nous vous remercions pour votre citoyenneté');
       },
     );
   } else {
@@ -92,7 +72,7 @@ Future registerEmployees(String titre, String categorie, String description,
       context: context,
       barrierDismissible: true,
       builder: (BuildContext dialogContext) {
-        return MyAlertDialog(title: 'gff', content: "Vérifiez vos champs");
+        return MyAlertDialog(title: 'Erreur', content: "Vérifiez vos champs");
       },
     );
   }
@@ -116,9 +96,8 @@ class MyCustomFormState extends State<MyCustomForm> {
   TextEditingController description = new TextEditingController();
   TextEditingController emplacement = new TextEditingController();
   TextEditingController categorie = new TextEditingController();
-  String _valueChanged = '';
-  String _valueToValidate = '';
-  String _valueSaved = '';
+
+  String _currentValue = 'Accident';
   File _file;
   final picker = ImagePicker();
 
@@ -138,21 +117,8 @@ class MyCustomFormState extends State<MyCustomForm> {
   void initState() {
     super.initState();
 
-    //_initialValue = 'starValue';
-    categorie = TextEditingController(text: 'starValue');
+    //_initialValue = 'starValue';)=
     _getUserLocation();
-    _getValue();
-  }
-
-  /// This implementation is just to simulate a load data behavior
-  /// from a data base sqlite or from a API
-  Future<void> _getValue() async {
-    await Future.delayed(const Duration(seconds: 3), () {
-      setState(() {
-        //_initialValue = 'circleValue';
-        categorie.text = 'circleValue';
-      });
-    });
   }
 
   @override
@@ -160,7 +126,7 @@ class MyCustomFormState extends State<MyCustomForm> {
     titre.text = '';
     description.text = '';
     emplacement.text = '';
-    categorie.text = '';
+    categorie.text = 'Accident';
     // Build a Form widget using the _formKey created above.
     return SingleChildScrollView(
         child: Form(
@@ -205,15 +171,19 @@ class MyCustomFormState extends State<MyCustomForm> {
                             color: color,
                           ),
                         )),
-                    SelectFormField(
-                      initialValue: 'value',
-                      items: _items,
-                      onChanged: (val) => setState(() => _valueChanged = val),
-                      validator: (val) {
-                        setState(() => _valueToValidate = val);
-                        return null;
+                    DropdownButton(
+                      items: list.map((String drop) {
+                        return DropdownMenuItem(
+                          value: drop,
+                          child: Text(drop),
+                        );
+                      }).toList(),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          this._currentValue = newValue;
+                        });
                       },
-                      onSaved: (val) => setState(() => _valueSaved = val),
+                      value: _currentValue,
                     ),
                     Padding(
                         padding: EdgeInsets.only(top: 15),
@@ -295,7 +265,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                                 // If the form is valid, display a Snackbar.
 
                                 String titr = titre.text;
-                                String cat = categorie.text;
+                                String cat = _currentValue;
                                 String des = description.text;
                                 registerEmployees(titr, cat, des, latitude,
                                     longitude, context);

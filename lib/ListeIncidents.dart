@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/main.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
@@ -77,7 +78,7 @@ class MylistState extends State<Mylist> {
 
   Future<String> getSWData() async {
     var res = await http.get(
-        'http://192.168.43.74:8080/GestionIncident/getIncidentByIdUser/USERKAKO2749');
+        'http://192.168.43.74:8080/GestionIncident/getIncidentByIdUser/$idUser');
 
     setState(() {
       var resBody = json.decode(res.body);

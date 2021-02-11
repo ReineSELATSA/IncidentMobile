@@ -1,71 +1,80 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/inscription.dart';
-import 'accueil.dart';
+import 'package:flutter_app/main.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 final color = const Color(0xFF3E3EB8);
-void main() {
-  runApp(new MyApp());
-}
 
-class MyApp extends StatelessWidget {
+class Inscription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'SELATSA',
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
+      home: new MyInscription(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class MyInscription extends StatefulWidget {
+  MyInscription({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyInscriptionState createState() => _MyInscriptionState();
 }
 
-String username = '';
-String idUser = '';
-String surnameUser = '';
-String emailUser = '';
-Future connexionUser(
-    String email, String password, BuildContext context) async {
-  var Url =
-      "http://192.168.43.74:8080/Connexion/connexionUser/$email/$password";
-  var response = await http.get(Url);
-
-  var resBody = json.decode(response.body);
-  var user = resBody['returnValue'];
-  username = user['nom'];
-  idUser = user['idUser'];
-  surnameUser = user['prenom'];
-  emailUser = user['email'];
+Future registerUser(String name, String surname, String email, String password,
+    BuildContext context) async {
+  var Url = "http://192.168.43.74:8080/GestionUser/createUser";
+  var response = await http.post(Url,
+      headers: <String, String>{"Content-Type": "application/json"},
+      body: jsonEncode(<String, String>{
+        "nom": name,
+        "prenom": surname,
+        "email": email,
+        "password": password
+      }));
 
   Map responseString = json.decode(response.body);
   if (responseString['returnValue'] != null) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return MyAlertDialog(title: 'Backend Response', content: response.body);
+      },
+    );
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Accueil();
+      return MyApp();
     }));
   } else {
-    MyAlertDialog(title: 'Connexion échouée', content: response.body);
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return MyAlertDialog(
+            title: 'Inscription échouée',
+            content: 'Adresse email déjà utilisée. Bien vouloir la changer');
+      },
+    );
   }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyInscriptionState extends State<MyInscription> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 12.0);
 
-  TextEditingController _passwordController = new TextEditingController();
+  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _surnameController = new TextEditingController();
+  TextEditingController _password2Controller = new TextEditingController();
   TextEditingController _emailController = new TextEditingController();
+  TextEditingController _passwordController = new TextEditingController();
 
   final _formKey = new GlobalKey<FormState>();
 
   String _email;
   String _password;
+  String _name;
+  String _surname;
 
   bool _autoValidate = false;
 
@@ -99,9 +108,41 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 100,
                         ),
                       ),
-                      SizedBox(height: 25.0),
+
+                      SizedBox(height: 15.0),
 
                       // TextFormField for email address
+
+                      TextFormField(
+                        keyboardType: TextInputType.text,
+                        autofocus: false,
+                        controller: _nameController,
+                        onSaved: (value) => _name = value,
+                        style: style,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+                            hintText: "Nom",
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0))),
+                      ),
+                      SizedBox(height: 15.0),
+
+                      TextFormField(
+                        keyboardType: TextInputType.text,
+                        autofocus: false,
+                        controller: _surnameController,
+                        onSaved: (value) => _surname = value,
+                        style: style,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+                            hintText: "Prénom",
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0))),
+                      ),
+
+                      SizedBox(height: 15.0),
 
                       TextFormField(
                         keyboardType: TextInputType.emailAddress,
@@ -112,13 +153,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: style,
                         decoration: InputDecoration(
                             contentPadding:
-                                EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                                EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
                             hintText: "Email",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0))),
                       ),
 
-                      SizedBox(height: 25.0),
+                      SizedBox(height: 15.0),
 
                       // TextFormField for email address
 
@@ -130,16 +171,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: style,
                         decoration: InputDecoration(
                             contentPadding:
-                                EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                                EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
                             hintText: "Password",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20.0),
                             )),
                       ),
-
-                      SizedBox(height: 25.0),
-
-                      Divider(color: Colors.black), // divider
 
                       SizedBox(height: 20.0),
 
@@ -153,10 +190,20 @@ class _MyHomePageState extends State<MyHomePage> {
                           padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
+                              // If the form is valid, display a Snackbar.
+                              String name = _nameController.text;
+                              String surname = _surnameController.text;
                               String email = _emailController.text;
                               String password = _passwordController.text;
 
-                              connexionUser(email, password, context);
+                              registerUser(
+                                  name, surname, email, password, context);
+                              /* 
+                              MyAlertDialog(
+                                  title: 'Inscription réussie',
+                                  content:
+                                      'Vous pouvez désormais vous connecter'); */
+
                             } else {
                               setState(() {
                                 // validation error
@@ -164,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               });
                             }
                           },
-                          child: Text("Login",
+                          child: Text("S'inscrire",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Colors.white,
@@ -179,11 +226,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return Inscription();
+                              return MyApp();
                             }));
                           },
                           child: Text(
-                            "Créer un compte",
+                            "J'ai déjà un compte",
                             style: TextStyle(
                                 color: Colors.blue,
                                 fontSize: 12,
@@ -224,4 +271,31 @@ String validateEmail(String value) {
     return 'Enter Valid Email';
   else
     return null;
+}
+
+class MyAlertDialog extends StatelessWidget {
+  final String title;
+  final String content;
+  final List<Widget> actions;
+
+  MyAlertDialog({
+    this.title,
+    this.content,
+    this.actions = const [],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        this.title,
+        style: Theme.of(context).textTheme.title,
+      ),
+      actions: this.actions,
+      content: Text(
+        this.content,
+        style: Theme.of(context).textTheme.body1,
+      ),
+    );
+  }
 }

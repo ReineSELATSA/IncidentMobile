@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/main.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'ListeIncidents.dart';
 import 'dart:convert';
+
 import 'addForm.dart';
+import 'main.dart' as connexion;
 import 'package:http/http.dart' as http;
 
 class Accueil extends StatelessWidget {
@@ -17,6 +20,8 @@ class Accueil extends StatelessWidget {
     );
   }
 }
+
+String user = connexion.username;
 
 class MyAccueil extends StatefulWidget {
   @override
@@ -236,7 +241,7 @@ class MyAccueilState extends State<MyAccueil> {
               color: color,
             ),
             title: new Text(
-              "Mes incidents",
+              user,
               style: TextStyle(color: color, fontSize: 13),
             ),
           ),
