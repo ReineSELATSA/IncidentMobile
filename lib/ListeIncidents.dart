@@ -29,6 +29,8 @@ class Mylist extends StatefulWidget {
   }
 }
 
+final color = const Color(0xFF3E3EB8);
+
 class MylistState extends State<Mylist> {
   var compteur = 0;
   var quiz = [
@@ -74,8 +76,8 @@ class MylistState extends State<Mylist> {
   List data = [];
 
   Future<String> getSWData() async {
-    var res =
-        await http.get('http://192.168.43.1:3000/GestionIncident/listIncident');
+    var res = await http.get(
+        'http://192.168.43.74:8080/GestionIncident/getIncidentByIdUser/USERKAKO2749');
 
     setState(() {
       var resBody = json.decode(res.body);
@@ -140,7 +142,7 @@ _information(context, data, index) {
         insetPadding: EdgeInsets.all(10),
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: Column(
               children: [
                 Text(
@@ -161,9 +163,7 @@ _information(context, data, index) {
                 Text(
                   'Description',
                   style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                      color: color, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 Text(data[index]['description']),
                 Container(
@@ -172,9 +172,7 @@ _information(context, data, index) {
                 Text(
                   'Emplacemzent',
                   style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                      color: color, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 Text(
                   data[index]['titre'],
@@ -185,9 +183,7 @@ _information(context, data, index) {
                 Text(
                   'Categorie',
                   style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                      color: color, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 Text(
                   data[index]['categorie'],
@@ -195,9 +191,7 @@ _information(context, data, index) {
                 Text(
                   'Medias',
                   style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                      color: color, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ],
             ),

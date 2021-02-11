@@ -35,35 +35,39 @@ class MyCustomForm extends StatefulWidget {
 
 final List<Map<String, dynamic>> _items = [
   {
-    'value': 'Dégradation du sol',
-    'label': 'Dégradation du sol',
+    'value': 'Dégradation',
+    'label': 'Dégradation',
   },
   {
     'value': 'Signalisation',
     'label': 'Signalisation',
   },
   {
-    'value': 'Malpropreté',
-    'label': 'Malpropreté',
+    'value': 'Incendie',
+    'label': 'Incendie',
   },
   {
-    'value': 'Eclairage',
-    'label': 'Eclairage',
+    'value': 'Accident',
+    'label': 'Accident',
   },
   {
-    'value': 'Animaux et végétaux',
-    'label': 'Animaux et végétaux',
+    'value': 'Panne électrique',
+    'label': 'Panne électrique',
   },
   {
-    'value': 'Incidents réparés',
-    'label': 'Box Label',
+    'value': 'Accidnet grave',
+    'label': 'Accidnet grave',
+  },
+  {
+    'value': 'Urgence Médicale',
+    'label': 'Urgence Médicale',
   },
 ];
 
 Future registerEmployees(String titre, String categorie, String description,
     double latitude, double longitude, BuildContext context) async {
   var Url =
-      "http://192.168.43.1:3000/GestionIncident/createIncident/USERKAKO2749/$titre/$categorie/$description";
+      "http://192.168.43.74:8080/GestionIncident/createIncident/USERKAKO2749/$titre/$categorie/$description/$latitude/$longitude";
   var response = await http.post(Url,
       headers: <String, String>{"Content-Type": "application/json"},
       body: jsonEncode(<String, String>{
@@ -95,6 +99,7 @@ Future registerEmployees(String titre, String categorie, String description,
 }
 
 class MyCustomFormState extends State<MyCustomForm> {
+  final color = const Color(0xFF3E3EB8);
   static double longitude;
   static double latitude;
   void _getUserLocation() async {
@@ -168,10 +173,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                         padding: EdgeInsets.only(top: 18, bottom: 4),
                         child: Text(
                           "Photos",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.blue,
-                          ),
+                          style: TextStyle(fontSize: 18, color: color),
                         )),
                     Row(
                       children: [
@@ -200,7 +202,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                           "Catégorie",
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.blue,
+                            color: color,
                           ),
                         )),
                     SelectFormField(
@@ -219,16 +221,15 @@ class MyCustomFormState extends State<MyCustomForm> {
                           "Titre",
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.blue,
+                            color: color,
                           ),
                         )),
                     TextFormField(
                       controller: titre,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                           hintText: 'Entrer un titre pour le signalement',
                           alignLabelWithHint: false,
-                          labelStyle:
-                              TextStyle(color: Colors.blue, fontSize: 25)),
+                          labelStyle: TextStyle(fontSize: 25, color: color)),
                       validator: (value) {
                         if (value.isEmpty) {
                           return 'Requis';
@@ -267,7 +268,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                           "Emplacement",
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.blue,
+                            color: color,
                           ),
                         )),
                     TextFormField(

@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'accueil.dart';
 
+final color = const Color(0xFF3E3EB8);
 void main() {
   runApp(new MyApp());
 }
@@ -45,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[400],
+      backgroundColor: color,
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -54,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              color: Color(0xffF3F3F3),
+              color: Colors.white,
               elevation: 5,
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -106,7 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                             hintText: "Password",
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0))),
+                              borderRadius: BorderRadius.circular(20.0),
+                            )),
                       ),
 
                       SizedBox(height: 25.0),
@@ -119,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         // login button
                         elevation: 5.0,
                         borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.blue,
+                        color: color,
                         child: MaterialButton(
                           minWidth: MediaQuery.of(context).size.width,
                           padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -144,7 +146,21 @@ class _MyHomePageState extends State<MyHomePage> {
                                   fontSize: 14)),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      Material(
+                        // login button
+                        color: Colors.transparent,
+                        child: MaterialButton(
+                          onPressed: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return Accueil();
+                            }));
+                          },
+                          child: Text("Créer un compte",
+                              style:
+                                  TextStyle(color: Colors.blue, fontSize: 12, decoration: TextDecoration.underline),
+                        ),
+                      ),
                     ],
                   ),
                 ),

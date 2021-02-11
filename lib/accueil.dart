@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'ListeIncidents.dart';
+import 'dart:convert';
 import 'addForm.dart';
+import 'package:http/http.dart' as http;
 
 class Accueil extends StatelessWidget {
   @override
@@ -24,6 +26,21 @@ class MyAccueil extends StatefulWidget {
 }
 
 class MyAccueilState extends State<MyAccueil> {
+  final color = const Color(0xFF3E3EB8);
+
+  List data;
+  Future<String> getSWData() async {
+    var res = await http
+        .get('http://192.168.43.74:8080/GestionIncident/listIncident');
+
+    setState(() {
+      var resBody = json.decode(res.body);
+      data = resBody['returnValue'];
+    });
+
+    return "Success!";
+  }
+
   final Set<Marker> _markers = {};
   BitmapDescriptor mapMarker;
   BitmapDescriptor good;
@@ -40,39 +57,6 @@ class MyAccueilState extends State<MyAccueil> {
         ImageConfiguration(), 'images/middle.png');
   }
 
-  final List data = [
-    {
-      "titre": "fsd",
-      "description": "lksdfjsd",
-      "latitude": "3.8261317",
-      "longitude": "11.4937302",
-    },
-    {
-      "titre": "DF",
-      "description": "lSFkjsd",
-      "latitude": "3.8261317",
-      "longitude": "11.4857302",
-    },
-    {
-      "titre": "llssdl",
-      "description": "lkjsfdsd",
-      "latitude": "3.8261317",
-      "longitude": "11.4737302",
-    },
-    {
-      "titre": "bonjour",
-      "description": "lkjsd",
-      "latitude": "3.8261317",
-      "longitude": "11.4840302",
-    },
-    {
-      "titre": "oui",
-      "description": "lkjsd",
-      "latitude": "3.8261317",
-      "longitude": "11.4887302",
-    },
-  ];
-
   static LatLng _initialPosition;
   static double a;
 
@@ -81,6 +65,7 @@ class MyAccueilState extends State<MyAccueil> {
     super.initState();
     _getUserLocation();
     setCustomMarker();
+    getSWData();
   }
 
   void _getUserLocation() async {
@@ -95,23 +80,20 @@ class MyAccueilState extends State<MyAccueil> {
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
       data.forEach((element) {
-        if (element['titre'].toString() == "bonjour") {
-          mapMarker = good;
-        } else if (element['titre'].toString() == 'oui') {
+        if (element['status'] == 'En cours de Traitement') {
+          mapMarker = middle;
+        } else if (element['status'] == 'En attente') {
           mapMarker = bad;
         } else {
-          mapMarker = middle;
+          mapMarker = good;
         }
         _markers.add(
           Marker(
             markerId: MarkerId(element['titre']),
-            position: LatLng(double.parse(element['latitude']),
-                double.parse(element['longitude'])),
-            icon : mapMarker,
+            position: LatLng(element['latitude'], element['longitude']),
+            icon: mapMarker,
             infoWindow: InfoWindow(
-                title: element['titre'],
-                snippet:
-                    "$element['description']" + "\n" + "$element['latitude']"),
+                title: element['status'], snippet: element['categorie']),
           ),
         );
       });
@@ -149,7 +131,7 @@ class MyAccueilState extends State<MyAccueil> {
                       context, MaterialPageRoute(builder: (context) => quiz())); */
                 }),
             Divider(
-              color: Colors.redAccent,
+              color: color,
             ),
             ListTile(
                 title: Text(
@@ -164,7 +146,7 @@ class MyAccueilState extends State<MyAccueil> {
                       context, MaterialPageRoute(builder: (context) => quiz())); */
                 }),
             Divider(
-              color: Colors.redAccent,
+              color: color,
             ),
             ListTile(
                 title: Text(
@@ -179,12 +161,13 @@ class MyAccueilState extends State<MyAccueil> {
                       context, MaterialPageRoute(builder: (context) => quiz())); */
                 }),
             Divider(
-              color: Colors.redAccent,
+              color: color,
             ),
           ],
         ),
       ),
       appBar: new AppBar(
+        backgroundColor: color,
         title: new Text('Incidenz'),
         actions: <Widget>[
           IconButton(
@@ -206,6 +189,7 @@ class MyAccueilState extends State<MyAccueil> {
         mapType: MapType.normal,
       ),
       floatingActionButton: new FloatingActionButton(
+        backgroundColor: color,
         onPressed: () {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => AddForm()));
@@ -237,12 +221,24 @@ class MyAccueilState extends State<MyAccueil> {
         },
         items: [
           new BottomNavigationBarItem(
-            icon: new Icon(Icons.search),
-            title: new Text(a.toString()),
+            icon: new Icon(
+              Icons.search,
+              color: color,
+            ),
+            title: new Text(
+              "Recherche",
+              style: TextStyle(color: color, fontSize: 11),
+            ),
           ),
           new BottomNavigationBarItem(
-            icon: new Icon(Icons.navigation_sharp),
-            title: new Text("43"),
+            icon: new Icon(
+              Icons.navigation_sharp,
+              color: color,
+            ),
+            title: new Text(
+              "Mes incidents",
+              style: TextStyle(color: color, fontSize: 13),
+            ),
           ),
         ],
       ),
