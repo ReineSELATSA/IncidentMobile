@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/incidenz.dart';
 import 'package:flutter_app/main.dart';
+import 'package:flutter_app/profile.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'ListeIncidents.dart';
@@ -98,7 +100,7 @@ class MyAccueilState extends State<MyAccueil> {
             position: LatLng(element['latitude'], element['longitude']),
             icon: mapMarker,
             infoWindow: InfoWindow(
-                title: element['status'], snippet: element['categorie']),
+                title: element['titre'], snippet: element['dateIncident']),
           ),
         );
       });
@@ -117,7 +119,7 @@ class MyAccueilState extends State<MyAccueil> {
               child: Center(
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage('df'),
+                  backgroundImage: NetworkImage('images/logo.png'),
                 ),
               ),
               decoration: BoxDecoration(
@@ -125,31 +127,18 @@ class MyAccueilState extends State<MyAccueil> {
             ),
             ListTile(
                 title: Text(
-                  'Profile',
+                  'Profil',
                   style: TextStyle(fontSize: 15),
                 ),
                 trailing: Icon(Icons.person),
                 onTap: () {
-                  /* 
                   Navigator.of(context).pop();
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => quiz())); */
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyProfile()));
                 }),
             Divider(
               color: color,
             ),
-            ListTile(
-                title: Text(
-                  'Paramètres',
-                  style: TextStyle(fontSize: 15),
-                ),
-                trailing: Icon(Icons.settings),
-                onTap: () {
-                  /* 
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => quiz())); */
-                }),
             Divider(
               color: color,
             ),
@@ -160,10 +149,9 @@ class MyAccueilState extends State<MyAccueil> {
                 ),
                 trailing: Icon(Icons.account_box),
                 onTap: () {
-                  /* 
                   Navigator.of(context).pop();
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => quiz())); */
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Incidenz()));
                 }),
             Divider(
               color: color,
@@ -174,14 +162,6 @@ class MyAccueilState extends State<MyAccueil> {
       appBar: new AppBar(
         backgroundColor: color,
         title: new Text('Incidenz'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            color: Colors.white,
-            onPressed: () {},
-            padding: const EdgeInsets.only(right: 20.0),
-          )
-        ],
         centerTitle: true,
       ),
       body: GoogleMap(
@@ -241,7 +221,7 @@ class MyAccueilState extends State<MyAccueil> {
               color: color,
             ),
             title: new Text(
-              user,
+              "Mes Incidents",
               style: TextStyle(color: color, fontSize: 13),
             ),
           ),

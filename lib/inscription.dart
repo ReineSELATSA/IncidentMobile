@@ -103,7 +103,7 @@ class _MyInscriptionState extends State<MyInscription> {
                     children: <Widget>[
                       Center(
                         child: Image.asset(
-                          "images/add.png",
+                          "images/logo.png",
                           height: 100,
                           width: 100,
                         ),

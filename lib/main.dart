@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/inscription.dart';
+import 'package:flutter_app/profile.dart';
 import 'accueil.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SELATSA',
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
+      home: new MyHomePage(title: 'Incidenz'),
     );
   }
 }
@@ -48,11 +49,19 @@ Future connexionUser(
 
   Map responseString = json.decode(response.body);
   if (responseString['returnValue'] != null) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
       return Accueil();
-    }));
+    }), (route) => false);
   } else {
-    MyAlertDialog(title: 'Connexion échouée', content: response.body);
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return MyAlertDialog(
+            title: 'Connexion échouée',
+            content: 'Bien vouloir entrer les bon identifiants');
+      },
+    );
   }
 }
 
@@ -94,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       Center(
                         child: Image.asset(
-                          "images/add.png",
+                          "images/logo.png",
                           height: 100,
                           width: 100,
                         ),
@@ -113,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         decoration: InputDecoration(
                             contentPadding:
                                 EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                            hintText: "Email",
+                            hintText: "Adresse email",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0))),
                       ),
@@ -124,6 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       TextFormField(
                         autofocus: false,
+                        obscureText: true,
                         controller: _passwordController,
                         validator: validatePassword,
                         onSaved: (value) => _password = value,
@@ -131,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         decoration: InputDecoration(
                             contentPadding:
                                 EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                            hintText: "Password",
+                            hintText: "Mot de passe",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20.0),
                             )),
@@ -164,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               });
                             }
                           },
-                          child: Text("Login",
+                          child: Text("Se connecter",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Colors.white,
@@ -207,9 +217,9 @@ String validatePassword(String value) {
   Pattern pattern = r'^(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
   RegExp regex = new RegExp(pattern);
   if (value.length == 0) {
-    return "Password is Required";
+    return "Champs obligatoire";
   } else if (!regex.hasMatch(value))
-    return 'Password required: Alphabet, Number & 8 chars';
+    return 'Alphabet, nombres, caractères spéciaux';
   else
     return null;
 }
@@ -219,9 +229,9 @@ String validateEmail(String value) {
       r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
   RegExp regex = new RegExp(pattern);
   if (value.length == 0) {
-    return "Email is Required";
+    return "Champs obligatoire";
   } else if (!regex.hasMatch(value))
-    return 'Enter Valid Email';
+    return 'Entrez une adresse valide';
   else
     return null;
 }

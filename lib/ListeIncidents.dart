@@ -18,6 +18,7 @@ class _IncidentState extends State<ListeIncidents> {
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text(appTitle),
+          backgroundColor: color,
         ),
         body: Mylist());
   }
@@ -110,7 +111,7 @@ class MylistState extends State<Mylist> {
                 child: Row(
                   children: [
                     Image.asset(
-                      quiz[2]['image'],
+                      'images/incident.jpg',
                       height: 100,
                       width: 100,
                       fit: BoxFit.fill,
@@ -146,19 +147,28 @@ _information(context, data, index) {
             padding: EdgeInsets.all(8.0),
             child: Column(
               children: [
+                SizedBox(
+                  height: 20,
+                ),
                 Text(
                   data[index]['titre'],
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(
                   data[index]['dateIncident'],
                   style: TextStyle(fontSize: 12),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
                 Container(
                   child: _result(data[index]['status']),
                 ),
-                Container(
+                SizedBox(
                   height: 20,
                 ),
                 Text(
@@ -166,14 +176,20 @@ _information(context, data, index) {
                   style: TextStyle(
                       color: color, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(data[index]['description']),
                 Container(
                   height: 20,
                 ),
                 Text(
-                  'Emplacemzent',
+                  'Emplacement',
                   style: TextStyle(
                       color: color, fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                SizedBox(
+                  height: 10,
                 ),
                 Text(
                   data[index]['titre'],
@@ -186,13 +202,14 @@ _information(context, data, index) {
                   style: TextStyle(
                       color: color, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(
                   data[index]['categorie'],
                 ),
-                Text(
-                  'Medias',
-                  style: TextStyle(
-                      color: color, fontWeight: FontWeight.bold, fontSize: 15),
+                SizedBox(
+                  height: 20,
                 ),
               ],
             ),
@@ -204,14 +221,14 @@ _information(context, data, index) {
 }
 
 _result(name) {
-  if (name == "en cours d'excécution") {
+  if (name == "En cours de Traitement") {
     return Row(
       children: [
         Icon(Icons.autorenew),
         Text('Incident en cours de traitement')
       ],
     );
-  } else if (name == "signalé") {
+  } else if (name == "En attente") {
     return Row(
       children: [Icon(Icons.dangerous), Text('Incident signalé')],
     );

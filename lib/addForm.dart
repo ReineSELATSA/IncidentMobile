@@ -21,6 +21,7 @@ class _FormState extends State<AddForm> {
     final appTitle = "Formulaire de déclaration d'incident";
     return new Scaffold(
         appBar: AppBar(
+          backgroundColor: color,
           title: Text(appTitle),
         ),
         body: SingleChildScrollView(child: MyCustomForm()));
@@ -39,8 +40,9 @@ var list = [
   'Dégradation',
   'Signalisation',
   'Panne électrique',
-  'Accidnet grave',
-  'Urgence Médicale'
+  'Accident grave',
+  'Urgence Médicale',
+  'Eclairage'
 ];
 
 Future registerEmployees(String titre, String categorie, String description,
@@ -213,7 +215,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                           "Description",
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.blue,
+                            color: color,
                           ),
                         )),
                     TextFormField(
@@ -227,7 +229,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                               TextStyle(color: Colors.blue, fontSize: 25)),
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Veuillez remplir le champs';
+                          return 'Veuillez remplir le champ';
                         }
                         return null;
                       },
@@ -255,25 +257,40 @@ class MyCustomFormState extends State<MyCustomForm> {
                         return null;
                       },
                     ),
-                    new Container(
-                        padding: const EdgeInsets.only(left: 150.0, top: 40.0),
-                        child: new RaisedButton(
-                            child: const Text('Submit'),
-                            onPressed: () {
-                              // It returns true if the form is valid, otherwise returns false
-                              if (_formKey.currentState.validate()) {
-                                // If the form is valid, display a Snackbar.
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Material(
+                      // login button
+                      elevation: 5.0,
+                      borderRadius: BorderRadius.circular(20.0),
+                      color: color,
+                      child: MaterialButton(
+                        minWidth: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                        onPressed: () {
+                          // It returns true if the form is valid, otherwise returns false
+                          if (_formKey.currentState.validate()) {
+                            // If the form is valid, display a Snackbar.
 
-                                String titr = titre.text;
-                                String cat = _currentValue;
-                                String des = description.text;
-                                registerEmployees(titr, cat, des, latitude,
-                                    longitude, context);
-                                titre.text = '';
-                                categorie.text = '';
-                                description.text = '';
-                              }
-                            })),
+                            String titr = titre.text;
+                            String cat = _currentValue;
+                            String des = description.text;
+                            registerEmployees(
+                                titr, cat, des, latitude, longitude, context);
+                            titre.text = '';
+                            categorie.text = '';
+                            description.text = '';
+                          }
+                        },
+                        child: Text("Valider",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14)),
+                      ),
+                    ),
                   ],
                 ),
                 padding: EdgeInsets.all(12))));
